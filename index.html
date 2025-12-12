@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>College Attendance System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Welcome to College Attendance System</h1>
+
+    <button class="btn">Generate QR Code</button>
+</body>
+</html>
+ 
+ 
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>College Attendance System</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>College Attendance System (QR)</h1>
+  <ul>
+    <li><a href="/generate">Generate Student QR</a></li>
+    <li><a href="/scan">Scan QR (Mark Attendance)</a></li>
+    <li><a href="/attendance">View Attendance</a></li>
+    <li><a href="/students">View Students</a></li>
+  </ul>
+</body>
+</html>
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Generate QR</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Generate Student QR</h2>
+  <form method="post">
+    Name: <input name="name" required><br><br>
+    Roll No: <input name="roll" required><br><br>
+    <button type="submit">Generate QR</button>
+  </form>
+  <p><a href="/">Back</a></p>
+</body>
+</html>
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Scan QR</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <h2>Scan QR to mark attendance</h2>
+
+  <video id="video" width="320" height="240" style="border:1px solid #ccc"></video>
+
+  <form method="POST">
+    <input name="qr_value" id="qr_value" hidden>
+    <br>
+    <button type="submit">Submit Attendance</button>
+  </form>
+
+  <p><a href="/">Back</a></p>
+
+  <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+  <script>
+    const video = document.getElementById('video');
+    const qrInput = document.getElementById('qr_value');
+
+    // ask camera
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => {
+        video.srcObject = stream;
+        video.play();
+
+        const qrScanner = new QrScanner(video, result => {
+          qrInput.value = result;
+          alert("QR Detected: " + result + "\nNow click Submit Attendance");
+          // optionally auto-submit:
+          // document.forms[0].submit();
+        });
+        qrScanner.start();
+      })
+      .catch(err => {
+        alert("Camera access denied or not available. Error: " + err);
+      });
+  </script>
+</body>
+</html>
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Attendance Records</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Attendance Records</h2>
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>ID</th><th>Roll No</th><th>Time</th>
+    </tr>
+    {% for row in data %}
+    <tr>
+      <td>{{ row[0] }}</td>
+      <td>{{ row[1] }}</td>
+      <td>{{ row[2] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><a href="/">Back</a></p>
+</body>
+</html>
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Students</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>Students</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>ID</th><th>Name</th><th>Roll</th><th>QR</th></tr>
+    {% for s in students %}
+    <tr>
+      <td>{{ s[0] }}</td>
+      <td>{{ s[1] }}</td>
+      <td>{{ s[2] }}</td>
+      <td>
+        {% if s[3] %}
+          <a href="/{{ s[3] }}">Open</a> |
+          <a href="/qr_codes/{{ s[2]}}.png" target="_blank">View QR</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><a href="/">Back</a></p>
+</body>
+</html>
+
